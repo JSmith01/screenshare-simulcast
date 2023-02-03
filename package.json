@@ -1,0 +1,13 @@
+{
+  "name": "simulcast-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "draw-graphs.js",
+  "scripts": {
+    "start": "serve ."
+  },
+  "author": "",
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
