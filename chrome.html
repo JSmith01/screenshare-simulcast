@@ -91,8 +91,7 @@ window.RTCPeerConnection.prototype.createOffer = function() {
     });
 }
 
-const CODEC = 'h264';
-const CODEC_PROFILE_ID = '42e01f';
+const DROP_CODEC_PAYLOADS = [96, 97, 102, 122, 127, 121];
 
 const pc1 = new RTCPeerConnection({sdpSemantics: 'unified-plan'});
 const pc2 = new RTCPeerConnection({sdpSemantics: 'unified-plan'});
@@ -105,16 +104,6 @@ navigator.mediaDevices.getDisplayMedia({video: true})
 .then((stream) => {
     pc1.addTrack(stream.getVideoTracks()[0], stream);
     show(stream, false);
-
-    const codecs = RTCRtpSender.getCapabilities('video').codecs
-            .filter(c => {
-              return c.mimeType.toLowerCase() === 'video/' + CODEC;
-            })
-            .filter(c => {
-              return !CODEC_PROFILE_ID || c.sdpFmtpLine.includes(CODEC_PROFILE_ID);
-            });
-    console.log('restricted codecs', codecs)
-    pc1.getTransceivers().forEach(tr => tr.setCodecPreferences(codecs));
     return pc1.createOffer({numberOfSimulcastLayers: 3});
 })
 .then((offer) => {
@@ -123,6 +112,7 @@ navigator.mediaDevices.getDisplayMedia({video: true})
     const ice = SDPUtils.getIceParameters(sections[1], sections[0]);
     const rtpParameters = SDPUtils.parseRtpParameters(sections[1]);
     const rtcpParameters = SDPUtils.parseRtcpParameters(sections[1]);
+    rtpParameters.codecs = rtpParameters.codecs.filter(codec => !DROP_CODEC_PAYLOADS.includes(codec.payloadType))
 
     // unified plan things.
     rtpParameters.headerExtensions = rtpParameters.headerExtensions.filter(ext => {
