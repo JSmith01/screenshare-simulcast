@@ -16,16 +16,13 @@ video {
 </style>
 </head>
 <body>
+<button id="start">start</button>
 <div id="local">
   <h2>Local Video</h2>
 </div>
 <div id="remotes">
   <h2>Remote Videos</h2>
 </div>
-<p>
-  Use ?codec=<i>h264|vp8</i>&profile=<i>h264profile</i> in the URL to optionally filter the codec.
-  The ?resolution=<i>1080p|720p|360p</i> parameter restricts the getUserMedia resolution.
-</p>
 <script>
 
 const pc1 = new RTCPeerConnection({sdpSemantics: 'unified-plan'});
@@ -43,6 +40,11 @@ const rids = [0, 1, 2];
 
 const CODEC = 'h264';
 const CODEC_PROFILE_ID = '42e01f';
+
+let start = false;
+document.getElementById('start').onclick = () => {
+if (start) return;
+start = true;
 
 navigator.mediaDevices.getDisplayMedia({ video: true })
 .then((stream) => {
@@ -169,6 +171,8 @@ navigator.mediaDevices.getDisplayMedia({ video: true })
     }, 2000);
 })
 .catch(e => console.error(e));
+
+}
 </script>
 </body>
 </html>
