@@ -73,17 +73,18 @@
     document.getElementById('start').onclick = () => {
         if (start) return;
         start = true;
+        let sendingTransceiver;
+        const scalabilityMode = document.getElementById('scalabilityMode').value;
+        console.log('scalabilityMode', scalabilityMode);
 
         navigator.mediaDevices.getDisplayMedia({ video: true })
             .then((stream) => {
-                const transceiver = pc1.addTransceiver(stream.getVideoTracks()[0], {
+                sendingTransceiver = pc1.addTransceiver(stream.getVideoTracks()[0], {
                     streams: [stream],
                     sendEncodings: rids.map(rid => ({rid})),
                 });
-                setCodec(transceiver);
-                const scalabilityMode = document.getElementById('scalabilityMode').value;
-                console.log('scalabilityMode', scalabilityMode);
-                setScalabilityMode(transceiver.sender, scalabilityMode);
+                setCodec(sendingTransceiver);
+                // setScalabilityMode(sendingTransceiver.sender, scalabilityMode);
                 show(stream, false);
                 return pc1.createOffer();
             })
@@ -187,6 +188,8 @@
                 ]);
             })
             .then(() => {
+                setScalabilityMode(sendingTransceiver.sender, scalabilityMode);
+
                 window.setInterval(() => {
                     draw(pc1, pc2);
                 }, 2000);
